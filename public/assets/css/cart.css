@@ -1,0 +1,21 @@
+.header-section,
+button {
+    background-color: #FFC400;
+}
+
+input {
+    background: #F5F5F5;
+    margin: 0 -10px;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
