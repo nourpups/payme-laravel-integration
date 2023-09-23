@@ -45,7 +45,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $user = Cache::get("posts:$user->id");
+//        $user = Cache::get("posts:$user->id");
         return view('users.show', compact('user'));
     }
 

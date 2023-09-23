@@ -1,47 +1,44 @@
 version: "3"
 
 services:
-  nginx:
-    image: nginx:latest
-    volumes:
-      - ./:/var/www/
-      - ./_docker/nginx/conf.d/:/etc/nginx/conf.d
-    ports:
-      - "8876:80"
-    depends_on:
-      - app
-    container_name: docker_guru_nginx
-  app:
-    build:
-      context: .
-      dockerfile: _docker/app/Dockerfile
-    volumes:
-      - ./:/var/www
-    user: 1000:1000
-    depends_on:
-      - db
-#      - cache
-    container_name: docker_guru_app
-  db:
-    image: mysql:8.0
-    restart: always
-    volumes:
-      - ./tmp/db:/var/lib/mysql
-    environment:
-      MYSQL_DATABASE: docker_guru
-      MYSQL_ROOT_PASSWORD: root
-    ports:
-      - "8101:3306"
-    container_name: docker_guru_db
-#  cache:
-#      image: redis:latest
-#      restart: always
-#      volumes:
-#          - ./tmp/cache:/data
-#      environment:
-#          REDIS_HOST: cache
-#          REDIS_PORT: 6379
-#      command: redis-server --requirepass redispass
-#      ports:
-#          - "6379:6379"
-#      container_name: docker_guru_redis
+    nginx:
+        image: nginx:latest
+        volumes:
+            - ./:/var/www/
+            - ./_docker/nginx/conf.d/:/etc/nginx/conf.d
+        ports:
+            - "8876:80"
+        depends_on:
+            - app
+        container_name: docker_guru_nginx
+    app:
+        build:
+            context: .
+            dockerfile: _docker/app/Dockerfile
+        volumes:
+            - ./:/var/www
+        user: 1000:1000
+        depends_on:
+            - db
+        container_name: docker_guru_app
+    npm:
+        image: node:18
+        restart: always
+        working_dir: /var/www
+        ports:
+            - "4026:8080"
+        volumes:
+            - .:/var/www
+        command: bash -c "npm i && npm run dev"
+        container_name: docker_guru_npm
+    db:
+        image: mysql:8.0
+        restart: always
+        volumes:
+            - ./tmp/db:/var/lib/mysql
+        environment:
+            MYSQL_DATABASE: docker_guru
+            MYSQL_ROOT_PASSWORD: root
+        ports:
+            - "8101:3306"
+        container_name: docker_guru_db

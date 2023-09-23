@@ -13,7 +13,6 @@ class ProductController extends Controller
      */
     public function index()
     {
-//        session()->forget('cart');
         $products = Product::all();
 
         return view('products.index', compact('products'));
