@@ -5,6 +5,8 @@
 
 `cd payme-laravel-integration`
 
+`npm i && npm run dev` // не смог устанвить npm внутри docker, по этому на сейчас как то вот так :D
+
 `docker compose up -d`
 
 `docker exec -it docker_guru_app bash`
@@ -38,6 +40,7 @@
   Also displayed on login page.
 
 ## Final! Running on local server
+
 
 You can now access the server at [http://localhost:8876](http://localhost:8876)
 
