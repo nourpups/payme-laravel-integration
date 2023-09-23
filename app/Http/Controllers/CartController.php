@@ -32,7 +32,7 @@ class CartController extends Controller
             $cart->products[$product->id]['count'] += 1;
         } else {
 
-            $product->status = State::IN_CART;
+            $product->status = State::CART;
             $product['count'] = 1;
             $cart->products[$product->id] = $product;
         }
@@ -113,7 +113,11 @@ class CartController extends Controller
         $cart = session('cart');
 
         unset($cart->products[$request->product_id]);
+
+        dd($cart->products);
+
         session()->put('cart', $cart);
+
 
         session()->flash('flash', [
             'class' => 'red',

@@ -9,7 +9,11 @@
 @section('content')
 
     <div class="mb-12">
-        <ul class="p-8">
+        <div class="text-center">
+            <p class="title font-semibold text-sm">Total</p>
+            <p class="value font-semibold text-lg font-bold">{{$cart->amount}}</p>
+        </div>
+        <ul class="p-4">
 
             @if($cart->products->isEmpty())
                 <li class="text-center">There is no products...</li>
@@ -30,7 +34,7 @@
                                 <button
                                     class="fa fa-plus rounded-lg bg-yellow-400 flex justify-center items-center p-3 z-10"></button>
                             </div>
-                                <button class="fa-solid fa-trash rounded hover:bg-purple-200 p-2"></button>
+                            <button class="fa-solid fa-trash rounded hover:bg-purple-200 p-2"></button>
                         </div>
                     </li>
                 @endforeach
@@ -39,15 +43,14 @@
     </div>
 
     <div class="header-section flex flex-row px-8 py-1 fixed bottom-0 w-screen w-full z-50">
-        <div class="mr-12">
-            <p class="title font-semibold text-sm">Total</p>
-            <p class="value font-semibold text-lg font-bold">{{$cart->amount}}</p>
-        </div>
         <div class="flex-grow text-center">
-            <button class="bg-white px-10 py-3 rounded-lg w-full">
-                <span class="font-bold">Checkout</span>
-                <i class="fa fa-chevron-right"></i>
-            </button>
+            <form action="{{route('cart.store')}}" method="POST">
+                @csrf
+                <button class="bg-white px-10 py-3 rounded-lg w-full">
+                    <span class="font-bold">Checkout</span>
+                    <i class="fa fa-chevron-right"></i>
+                </button>
+            </form>
         </div>
     </div>
     @endif
@@ -91,7 +94,7 @@
                         product_id: product_id,
                     },
                     success: function (res) {
-                       window.location.reload()
+                        window.location.reload()
                     }
                 })
             }

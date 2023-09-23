@@ -21,16 +21,6 @@ services:
         depends_on:
             - db
         container_name: docker_guru_app
-    npm:
-        image: node:18
-        restart: always
-        working_dir: /var/www
-        ports:
-            - "4026:8080"
-        volumes:
-            - .:/var/www
-        command: bash -c "npm i && npm run dev"
-        container_name: docker_guru_npm
     db:
         image: mysql:8.0
         restart: always
