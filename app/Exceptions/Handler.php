@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use App\Http\Responses\PaymeResponse;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
@@ -24,10 +25,9 @@ class Handler extends ExceptionHandler
     public function register(): void
     {
         $this->renderable(function (PaymeException $e) {
-            return response()->json([
-                'jsonrpc' => "2.0",
-                'error' => $e->getError()
-            ]);
+            $response = new PaymeResponse();
+
+            return $response->error($e->getError());
         });
     }
 }

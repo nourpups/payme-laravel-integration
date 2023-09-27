@@ -17,7 +17,7 @@ use Illuminate\Http\JsonResponse;
 
 class Payme implements PaymeContract
 {
-    public function __construct(public array $parameters)
+    public function __construct(public array $parameters, public SuccesfulResponse $response)
     {
     }
 
@@ -61,7 +61,7 @@ class Payme implements PaymeContract
             ];
         }
 
-        return $this->successCheckPerformTransaction($items);
+        return $this->response->successCheckPerformTransaction($items);
     }
 
     /**
@@ -111,7 +111,7 @@ class Payme implements PaymeContract
                 throw TransactionException::timeoutExpired();
             }
 
-            return $this->successCreateTransaction(
+            return $this->response->successCreateTransaction(
                 $transaction->state,
                 $transaction->create_time,
                 $transaction->id
@@ -128,7 +128,7 @@ class Payme implements PaymeContract
             'order_id' => $account,
         ]);
 
-        return $this->successCreateTransaction(
+        return $this->response->successCreateTransaction(
             $transaction->state,
             $transaction->create_time,
             $transaction->id
@@ -162,7 +162,7 @@ class Payme implements PaymeContract
                 TransactionException::cantPerformTransaction()
             );
 
-            return $this->successPerformTransaction(
+            return $this->response->successPerformTransaction(
                 $transaction->perform_time,
                 $transaction->id,
                 $transaction->state
@@ -186,7 +186,7 @@ class Payme implements PaymeContract
         $transaction->perform_time = time() * 1000;
         $transaction->save();
 
-        return $this->successPerformTransaction(
+        return $this->response->successPerformTransaction(
             $transaction->perform_time,
             $transaction->id,
             $transaction->state
@@ -226,7 +226,7 @@ class Payme implements PaymeContract
                 'reason' => $reason
             ]);
 
-            return $this->successCancelTransaction(
+            return $this->response->successCancelTransaction(
                 $transaction->state,
                 $cancelTime,
                 $transaction->id
@@ -234,7 +234,7 @@ class Payme implements PaymeContract
         }
 
         if ($transaction->state !== State::DONE) {
-            return $this->successCancelTransaction(
+            return $this->response->successCancelTransaction(
                 $transaction->state,
                 $transaction->cancel_time,
                 $transaction->id
@@ -258,7 +258,7 @@ class Payme implements PaymeContract
             'reason' => $reason
         ]);
 
-        return $this->successCancelTransaction(
+        return $this->response->successCancelTransaction(
             $transaction->state,
             $cancelTime,
             $transaction->id
@@ -284,7 +284,7 @@ class Payme implements PaymeContract
             TransactionException::transactionNotFound()
         );
 
-        return $this->successCheckTransaction(
+        return $this->response->successCheckTransaction(
             $transaction->state,
             $transaction->create_time,
             $transaction->perform_time,
@@ -307,75 +307,8 @@ class Payme implements PaymeContract
         return true;
     }
 
-    private function successCreateTransaction($state, $createTime, $transaction): JsonResponse
-    {
-        return $this->success([
-            'create_time' => $createTime,
-            'perform_time' => 0,
-            'cancel_time' => 0,
-            'transaction' => (string)$transaction,
-            'state' => $state,
-            'reason' => null
-        ]);
-    }
-
-    private function successCheckPerformTransaction($items): JsonResponse
-    {
 
 
-        return $this->success([
-            'allow' => true,
-            'detail' => [
-                'receipt_type' => 0,
-                'items' => $items
-            ]
-        ]);
-    }
 
-    private function successPerformTransaction($state, $performTime, $transaction): JsonResponse
-    {
-        return $this->success([
-            'state' => $state,
-            'perform_time' => $performTime,
-            'transaction' => $transaction,
-        ]);
-    }
-
-    private function successCheckTransaction($state, $createTime, $performTime, $cancelTime, $transaction, $reason): JsonResponse
-    {
-        return $this->success([
-            'create_time' => $createTime ?? 0,
-            'perform_time' => $performTime ?? 0,
-            'cancel_time' => $cancelTime ?? 0,
-            'transaction' => $transaction,
-            'state' => $state,
-            'reason' => $reason
-        ]);
-    }
-
-    private function successCancelTransaction($state, $cancelTime, $transaction): JsonResponse
-    {
-        return $this->success([
-            'state' => $state,
-            'cancel_time' => $cancelTime,
-            'transaction' => strval($transaction)
-        ]);
-    }
-
-    private function success(array $result): JsonResponse
-    {
-        return response()->json([
-            'jsonrpc' => '2.0',
-            'result' => $result
-        ]);
-    }
-
-    private function error(array $error): JsonResponse
-    {
-        return response()->json([
-            'jsonrpc' => '2.0',
-            'error' => $error
-        ]);
-    }
 
 }
