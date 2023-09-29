@@ -1,11 +1,17 @@
-
+# About
+Интеграция Payme по протоколу Merchant API с мини фронтендом
+#### Frontend (mini-eShop)
+- Аутентификация 
+- Корзина (данные хранятся в сессии)
+#### Backend 
+- Кастомные исключения (Exceptions)
 # Installation
 
 `git clone https://github.com/nourpups/payme-laravel-integration.git`
 
 `cd payme-laravel-integration`
 
-`npm i && npm run dev` // не смог устанвить npm внутри docker, по этому на сейчас как то вот так :D
+`npm i && npm run dev` // не смог установить npm внутри docker, по этому на сейчас как то вот так :D
 
 `docker compose up -d`
 
