@@ -4,31 +4,58 @@ services:
     nginx:
         image: nginx:latest
         volumes:
-            - ./:/var/www/
+            - ./:/var/www
+            - ./storage:/var/www/storage
             - ./_docker/nginx/conf.d/:/etc/nginx/conf.d
         ports:
             - "8876:80"
         depends_on:
             - app
-        container_name: docker_guru_nginx
+        container_name: crm_nginx
     app:
+        build:
+            context: .
+            dockerfile: _docker/app/Dockerfile
+        user: 1000:1000
+        volumes:
+            - ./:/var/www
+            - ./storage:/var/www/storage
+        depends_on:
+            - db
+        container_name: crm_app
+    artisan:
         build:
             context: .
             dockerfile: _docker/app/Dockerfile
         volumes:
             - ./:/var/www
-        user: 1000:1000
         depends_on:
             - db
-        container_name: docker_guru_app
+        working_dir: /var/www
+        entrypoint: ['/var/www/artisan']
+        container_name: crm_artisan
+    composer:
+        image: composer:latest
+        volumes:
+            - ./:/var/www
+        working_dir: /var/www
+        container_name: crm_composer
+
+    npm:
+        image: node:20.9-alpine
+        volumes:
+            - ./:/var/www
+        working_dir: /var/www
+        entrypoint: ['npm']
+        container_name: crm_npm
     db:
         image: mysql:8.0
         restart: always
         volumes:
-            - ./tmp/db:/var/lib/mysql
+            - ./db/mysql:/var/lib/mysql
         environment:
-            MYSQL_DATABASE: docker_guru
+            MYSQL_DATABASE: homework-tracker
             MYSQL_ROOT_PASSWORD: root
         ports:
             - "8101:3306"
-        container_name: docker_guru_db
+        container_name: crm_db
