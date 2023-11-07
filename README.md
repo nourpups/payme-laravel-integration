@@ -3,32 +3,26 @@
 #### Frontend (mini-eShop)
 - Аутентификация 
 - Корзина (данные хранятся в сессии)
-#### Backend 
-- Кастомные исключения (Exceptions)
+
 # Installation
 
 `git clone https://github.com/nourpups/payme-laravel-integration.git`
 
 `cd payme-laravel-integration`
 
-`npm i && npm run dev` // не смог установить npm внутри docker, по этому на сейчас как то вот так :D
-
 `docker compose up -d`
 
-`docker exec -it docker_guru_app bash`
+`docker compose run --rm composer install`
 
-`composer install`
+### Copy .env.example to .env
 
-#### rename .env.example to .env
-
-`php artisan key:generate`
-
+`docker compose run --rm artisan key:generate`
 
 ## Set database settings
 
-`DB_DATABASE=db`
+`DB_HOST=db`
 
-`DB_DATABASE=docker_guru`
+`DB_DATABASE=payme_db`
 
 `DB_USERNAME=root`
 
@@ -36,17 +30,20 @@
 
 ## Migrations & Seeders
 
-`php artisan migrate`
+`docker compose run --rm artisan migrate`
 
-`php artisan db:seed`
+`docker compose run --rm artisan db:seed`
 
 ## Login credentials
 - Email: shuniyam@eploma.exx
 - Password: nouracea
-  Also displayed on login page.
+
+  *Also displayed on login page*.
 
 ## Final! Running on local server
 
+`docker compose run --rm npm install`
 
-You can now access the server at [http://localhost:8876](http://localhost:8876)
+`docker compose run --rm npm run build`
 
+You can now access the application at [http://localhost:8876](http://localhost:8876)

@@ -16,7 +16,7 @@ services:
         depends_on:
             - app
             - db
-        container_name: crm_nginx
+        container_name: payme_nginx
         networks:
             - laravel
     app:
@@ -29,7 +29,7 @@ services:
             - ./storage:/var/www/storage
         depends_on:
             - db
-        container_name: crm_app
+        container_name: payme_app
         networks:
             - laravel
     artisan:
@@ -42,7 +42,7 @@ services:
             - app
         working_dir: /var/www
         entrypoint: ['/var/www/artisan']
-        container_name: crm_artisan
+        container_name: payme_artisan
         networks:
             - laravel
     composer:
@@ -52,7 +52,7 @@ services:
         depends_on:
                     - app
         working_dir: /var/www
-        container_name: crm_composer
+        container_name: payme_composer
         networks:
             - laravel
 
@@ -62,7 +62,7 @@ services:
             - ./:/var/www
         working_dir: /var/www
         entrypoint: [ 'npm']
-        container_name: crm_npm
+        container_name: payme_npm
         networks:
             - laravel
     db:
@@ -75,6 +75,6 @@ services:
             MYSQL_ROOT_PASSWORD: root
         ports:
             - "8101:3306"
-        container_name: crm_db
+        container_name: payme_db
         networks:
             - laravel
