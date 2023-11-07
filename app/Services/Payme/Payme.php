@@ -17,8 +17,11 @@ use Illuminate\Http\JsonResponse;
 
 class Payme implements PaymeContract
 {
-    public function __construct(public array $parameters, public SuccesfulResponse $response)
+    public SuccesfulResponse $response;
+
+    public function __construct(public array $parameters)
     {
+        $this->response = new SuccesfulResponse();
     }
 
     /**
@@ -32,14 +35,8 @@ class Payme implements PaymeContract
             JsonException::jsonRpcError()
         );
 
-        $amount = $this->parameters['amount'];
         throw_if(
-            !$this->isAmountValid($amount),
-            AmountException::wrongAmount()
-        );
-
-        throw_if(
-            $key = $this->parameters['account']['order_id'],
+            $key = $this->parameters['account'][config('payme.identity')],
             OrderException::orderNotFound()::orderNotFound()
         );
 
@@ -47,6 +44,13 @@ class Payme implements PaymeContract
         throw_if(
             empty($order),
             OrderException::orderNotFound()
+        );
+
+        $amount = $this->parameters['amount'];
+        throw_if(
+            $order->amount !== $amount ||
+            !$this->isAmountValid($amount),
+            AmountException::wrongAmount()
         );
 
         $items = [];
@@ -216,7 +220,7 @@ class Payme implements PaymeContract
         if ($transaction->state === State::PENDING) {
             $order = Order::find($transaction->order_id);
             $order->update([
-               'state' => OrderState::CANCELED
+                'state' => OrderState::CANCELED
             ]);
 
             $cancelTime = time() * 1000;
@@ -286,12 +290,51 @@ class Payme implements PaymeContract
 
         return $this->response->successCheckTransaction(
             $transaction->state,
-            $transaction->create_time,
-            $transaction->perform_time,
-            $transaction->cancel_time,
-            $transaction->id,
+            $transaction->create_time ?? 0,
+            $transaction->perform_time ?? 0,
+            $transaction->cancel_time ?? 0,
+            (string)$transaction->id,
             $transaction->reason
         );
+    }
+
+    public function GetStatement(): JsonResponse
+    {
+        throw_if(
+            !$this->hasParameter('from', 'to'),
+            JsonException::jsonRpcError()
+        );
+        $from = $this->parameters['from'];
+        $to = $this->parameters['to'];
+
+        $transactions = PaymeTransaction::where('state', State::DONE)
+            ->whereBetween('pay_time', [$from, $to])
+            ->oldest('pay_time')
+            ->get();
+
+        if($transactions->isEmpty()) {
+            return $this->response->successGetStatement();
+        }
+
+        $transactions = $transactions->map(function ($transaction) {
+           return [
+               'id' => $transaction->id,
+               'time' => $transaction->pay_time,
+               'amount' => $transaction->amount,
+               'account' => [
+                   config('payme.identity') => $transaction->order_id
+               ],
+               'create_time' => $transaction->create_time,
+               'perform_time' => $transaction->perform_time,
+               'cancel_time' => $transaction->cancel_time,
+               'transaction' => $transaction->transaction,
+               'state' => $transaction->state,
+               'reason' => $transaction->reason,
+               'receivers' => null, // not implemented
+           ];
+        });
+
+        return $this->response->successGetStatement($transactions);
     }
 
     private function isAmountValid($amount): bool
@@ -307,8 +350,6 @@ class Payme implements PaymeContract
         return true;
     }
 
-
-
-
-
 }
+
+

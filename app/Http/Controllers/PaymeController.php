@@ -13,6 +13,7 @@ class PaymeController extends Controller
     public function __invoke(Request $request, Payme $payme)
     {
         $transactionMethod = $request['method'];
+        $payme = new Payme($request['params']);
         return $payme->{$transactionMethod}();
     }
 }

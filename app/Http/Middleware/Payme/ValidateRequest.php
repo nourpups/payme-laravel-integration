@@ -29,7 +29,7 @@ class ValidateRequest
         );
 
         throw_if(
-            in_array('Checkransaction', \App\Enum\Payme\Method::toArray()),
+            in_array($request['method'], \App\Enum\Payme\Method::toArray()),
             HttpException::methodNotFound()
         );
 

@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::redirect('/', 'products');
+Route::get('/clear', function () {
+   session()->forget('cart');
+});
 
 Route::any('payme/soqqadi-chiqar', PaymeController::class)->middleware('payme');
 

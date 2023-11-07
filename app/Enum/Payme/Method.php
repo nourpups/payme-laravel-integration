@@ -9,6 +9,7 @@ enum Method: string
     case PerformTransaction = 'PerformTransaction';
     case CancelTransaction = 'CancelTransaction';
     case CheckTransaction = 'CheckTransaction';
+    case GetStatement = 'GetStatement';
 
     public static function toArray(): array
     {

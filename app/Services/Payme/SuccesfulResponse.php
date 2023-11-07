@@ -41,12 +41,12 @@ class SuccesfulResponse extends PaymeResponse
         ]);
     }
 
-    public function successCheckTransaction($state, $createTime, $performTime, $cancelTime, $transaction, $reason): JsonResponse
+    public function successCheckTransaction($state, $createTime, $performTime, $cancelTime, string $transaction, $reason): JsonResponse
     {
         return $this->success([
-            'create_time' => $createTime ?? 0,
-            'perform_time' => $performTime ?? 0,
-            'cancel_time' => $cancelTime ?? 0,
+            'create_time' => $createTime,
+            'perform_time' => $performTime,
+            'cancel_time' => $cancelTime,
             'transaction' => $transaction,
             'state' => $state,
             'reason' => $reason
@@ -59,6 +59,12 @@ class SuccesfulResponse extends PaymeResponse
             'state' => $state,
             'cancel_time' => $cancelTime,
             'transaction' => (string)$transaction
+        ]);
+    }
+    public function successGetStatement($transactions = []): JsonResponse
+    {
+        return $this->success([
+            'transactions' => $transactions
         ]);
     }
 }
