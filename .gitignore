@@ -5,7 +5,7 @@
 /public/storage
 /storage/*.key
 /vendor
-/tmp/db
+/database/mysql
 .env
 .env.backup
 .env.production

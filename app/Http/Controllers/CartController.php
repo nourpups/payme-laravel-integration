@@ -85,18 +85,6 @@ class CartController extends Controller
                 ]
             );
         }
-        // sending check
-        $items = [];
-        foreach ($order->products as $product) {
-            $items[] = [
-                'title' => $product->name,
-                'price' => $product->price,
-                'count' => $order->count,
-                'code' => $product->code, // ИКПУ
-                'package_code' => $product->package_code,
-                'vat_percent' => Product::VAT_PERCENT, // НДС
-            ];
-        }
 
         Http::post('https://test.paycom.uz', [
             'merchant' => config('payme.merchant_id'),
@@ -112,12 +100,11 @@ class CartController extends Controller
     {
         $cart = session('cart');
 
-        unset($cart->products[$request->product_id]);
-
-        dd($cart->products);
+        $product = $cart->products[$request['product_id']];
+        $cart->amount -= ($product->price * $product->count);
+        $cart->products->forget($product->id);
 
         session()->put('cart', $cart);
-
 
         session()->flash('flash', [
             'class' => 'red',
