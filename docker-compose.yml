@@ -1,5 +1,8 @@
 version: "3"
 
+networks:
+    laravel:
+
 services:
     nginx:
         image: nginx:latest
@@ -9,9 +12,13 @@ services:
             - ./_docker/nginx/conf.d/:/etc/nginx/conf.d
         ports:
             - "8876:80"
+            - "5173:5173"
         depends_on:
             - app
+            - db
         container_name: crm_nginx
+        networks:
+            - laravel
     app:
         build:
             context: .
@@ -23,6 +30,8 @@ services:
         depends_on:
             - db
         container_name: crm_app
+        networks:
+            - laravel
     artisan:
         build:
             context: .
@@ -30,32 +39,42 @@ services:
         volumes:
             - ./:/var/www
         depends_on:
-            - db
+            - app
         working_dir: /var/www
         entrypoint: ['/var/www/artisan']
         container_name: crm_artisan
+        networks:
+            - laravel
     composer:
         image: composer:latest
         volumes:
             - ./:/var/www
+        depends_on:
+                    - app
         working_dir: /var/www
         container_name: crm_composer
+        networks:
+            - laravel
 
     npm:
         image: node:20.9-alpine
         volumes:
             - ./:/var/www
         working_dir: /var/www
-        entrypoint: ['npm']
+        entrypoint: [ 'npm']
         container_name: crm_npm
+        networks:
+            - laravel
     db:
         image: mysql:8.0
         restart: always
         volumes:
-            - ./db/mysql:/var/lib/mysql
+            - ./database/mysql:/var/lib/mysql
         environment:
             MYSQL_DATABASE: homework-tracker
             MYSQL_ROOT_PASSWORD: root
         ports:
             - "8101:3306"
         container_name: crm_db
+        networks:
+            - laravel
